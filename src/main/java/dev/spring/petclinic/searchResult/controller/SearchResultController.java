@@ -24,8 +24,8 @@ public class SearchResultController {
     @GetMapping("/owners/{ownerId}")
     public String searchResultDetail(@PathVariable("ownerId") int ownerId, Model model) {
         // ownerId에 해당하는 owner 정보 조회
-        OwnerDto owner = searchResultService.findOwner(ownerId);
-        model.addAttribute("owner", owner);
+        OwnerDto owners = searchResultService.findOwner(ownerId);
+        model.addAttribute("owners", owners);
 
         return "owners/ownerDetails";
     }
