@@ -9,7 +9,7 @@
     <h2>Owner Information</h2>
   
   
-    <table class="table table-striped" th:object="${owner}">
+    <table class="table table-striped" th:object="${owners}">
       <tr>
         <th>Name</th>
         <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
@@ -27,20 +27,20 @@
         <td th:text="*{telephone}"></td>
       </tr>
     </table>
-  
-    <a th:href="@{{id}/edit(id=${owner.id})}" class="btn btn-primary">Edit
+
+    <a th:href="@{{id}/edit(id=${owners.id})}" class="btn btn-primary">Edit
       Owner</a>
-    <a th:href="@{{id}/pets/new(id=${owner.id})}" class="btn btn-primary">Add
+    <a th:href="@{{id}/pets/new(id=${owners.id})}" class="btn btn-primary">Add
       New Pet</a>
-  
+
     <br />
     <br />
     <br />
     <h2>Pets and Visits</h2>
-  
+
     <table class="table table-striped">
-  
-      <tr th:each="pet : ${owner.pets}">
+
+      <tr th:each="pet : ${owners.pets}">
         <td valign="top">
           <dl class="dl-horizontal">
             <dt>Name</dt>
@@ -61,21 +61,21 @@
               </tr>
             </thead>
             <tr th:each="visit : ${pet.visits}">
-              <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
+              <td th:text="${#temporals.format(visit.getVisitDate, 'yyyy-MM-dd')}"></td>
               <td th:text="${visit?.description}"></td>
             </tr>
             <tr>
-              <td><a
-                th:href="@{{ownerId}/pets/{petId}/edit(ownerId=${owner.id},petId=${pet.id})}">Edit
-                  Pet</a></td>
-              <td><a
-                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owner.id},petId=${pet.id})}">Add
-                  Visit</a></td>
+<!--              <td><a-->
+<!--                th:href="@{{ownerId}/pets/{petId}/edit(ownerId=${owners.id},petId=${pet.id})}">Edit-->
+<!--                  Pet</a></td>-->
+<!--              <td><a-->
+<!--                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owners.id},petId=${pet.id})}">Add-->
+<!--                  Visit</a></td>-->
             </tr>
           </table>
         </td>
       </tr>
-  
+
     </table>
   
   </body>
