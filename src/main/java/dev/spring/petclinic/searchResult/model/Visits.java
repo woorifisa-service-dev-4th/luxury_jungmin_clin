@@ -1,13 +1,11 @@
-package dev.spring.petclinic.searchResult.dto;
+package dev.spring.petclinic.searchResult.model;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Builder
 @Getter
-public class PetVisitDto {
+public class Visits {
     private int id;
     private int petId;
     private LocalDate visitDate;
