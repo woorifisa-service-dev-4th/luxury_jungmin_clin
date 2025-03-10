@@ -10,7 +10,7 @@ import lombok.With;
 @Value
 @Builder
 @With
-public class OwnerDTO {
+public class OwnerEditDTO {
 
     private Integer id;
 
@@ -31,8 +31,8 @@ public class OwnerDTO {
     private String telephone;
 
     // ✅ Entity → DTO 변환 메서드
-    public static OwnerDTO fromEntity(Owner owner) {
-        return OwnerDTO.builder()
+    public static OwnerEditDTO fromEntity(Owner owner) {
+        return OwnerEditDTO.builder()
                 .id(owner.getId())
                 .firstName(owner.getFirstName())
                 .lastName(owner.getLastName())

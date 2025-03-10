@@ -3,7 +3,7 @@ package dev.spring.petclinic.createowner.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import dev.spring.petclinic.createowner.dto.OwnerDTO;
+import dev.spring.petclinic.createowner.dto.OwnerEditDTO;
 import dev.spring.petclinic.createowner.entity.Owner;
 import dev.spring.petclinic.createowner.mapper.OwnerMapper;
 import dev.spring.petclinic.exception.NotFoundException;
@@ -17,14 +17,14 @@ public class OwnerCreateService {
 
     // Owner 등록
     @Transactional
-    public void createOwner(OwnerDTO ownerDTO) {
-        ownerMapper.insertOwner(ownerDTO.toEntity());
+    public void createOwner(OwnerEditDTO ownerEditDTO) {
+        ownerMapper.insertOwner(ownerEditDTO.toEntity());
     }
 
     // Owner 수정
     @Transactional
-    public void updateOwner(OwnerDTO ownerDTO) {
-        int updated = ownerMapper.updateOwnerById(ownerDTO.toEntity());
+    public void updateOwner(OwnerEditDTO ownerEditDTO) {
+        int updated = ownerMapper.updateOwnerById(ownerEditDTO.toEntity());
         if (updated == 0) {
             throw new IllegalStateException("업데이트에 실패하였습니다.");
         }
@@ -32,12 +32,12 @@ public class OwnerCreateService {
 
     // ID로 Owner 조회
     @Transactional(readOnly = true)
-    public OwnerDTO findOwnerById(Integer id) {
+    public OwnerEditDTO findOwnerById(Integer id) {
         Owner owner = ownerMapper.findById(id);
         if (owner == null) {
             throw new NotFoundException("존재하지 않는 Owner입니다.");
         }
-        return OwnerDTO.fromEntity(owner);
+        return OwnerEditDTO.fromEntity(owner);
     }
 
     // 신규 등록 시 중복 전화번호 체크
