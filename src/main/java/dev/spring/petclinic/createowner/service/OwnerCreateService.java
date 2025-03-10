@@ -17,8 +17,10 @@ public class OwnerCreateService {
 
     // Owner 등록
     @Transactional
-    public void createOwner(OwnerEditDTO ownerEditDTO) {
-        ownerMapper.insertOwner(ownerEditDTO.toEntity());
+    public int createOwner(OwnerEditDTO ownerEditDTO) {
+        Owner owner = ownerEditDTO.toEntity();
+        ownerMapper.insertOwner(owner);
+        return owner.getId();
     }
 
     // Owner 수정
