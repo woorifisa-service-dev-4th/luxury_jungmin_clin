@@ -5,7 +5,7 @@ import dev.spring.petclinic.createowner.entity.Owner;
 
 @Mapper
 public interface OwnerMapper {
-    void insertOwner(Owner owner);
+    int insertOwner(Owner owner);
 
     Owner findById(Integer id);
 

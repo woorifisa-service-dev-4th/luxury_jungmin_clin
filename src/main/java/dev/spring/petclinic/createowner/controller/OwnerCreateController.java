@@ -41,8 +41,8 @@ public class OwnerCreateController {
             return "owners/createOrUpdateOwnerForm";
         }
 
-        ownerCreateService.createOwner(ownerDTO);
+        int newOwnerId = ownerCreateService.createOwner(ownerDTO);
         redirectAttributes.addFlashAttribute("message", "Owner 생성이 성공적으로 완료되었습니다.");
-        return "redirect:/owners/" + ownerDTO.getId();
+        return "redirect:/owners/" + newOwnerId;
     }
 }
