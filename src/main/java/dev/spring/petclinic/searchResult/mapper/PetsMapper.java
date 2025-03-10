@@ -9,4 +9,7 @@ import java.util.List;
 public interface PetsMapper {
     // ownerId 기반으로 Pets List 조회
     List<Pets> selectPetsByOwnerId(int ownerId);
+
+    // pet 저장
+    void insertPet(Pets pet);
 }

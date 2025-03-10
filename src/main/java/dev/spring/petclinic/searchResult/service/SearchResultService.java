@@ -92,7 +92,7 @@ public class SearchResultService {
                     .id(pet.getId())
                     .name(pet.getName())
                     .birthDate(pet.getBirthDate())
-                    .type(pet.getType())
+                    .typeId(pet.getTypeId())
                     .visits(findPetVisitsByPet(pet.getId()))
                     .build();
             petDtoList.add(petDto);
