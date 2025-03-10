@@ -24,6 +24,13 @@
         WHERE last_name LIKE CONCAT('%', #{lastName}, '%')
     </select>
 
+    <!-- Owner ID로 해당하는 Pet 정보 조회 -->
+    <select id="findPetsByOwnerId" parameterType="long" resultType="dev.spring.petclinic.findowner.model.Pet">
+        SELECT name
+        FROM pets
+        WHERE owner_id = #{ownerId}
+    </select>
+
 
 
 </mapper>
