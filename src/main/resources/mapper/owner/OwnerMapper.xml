@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.spring.petclinic.mapper.owner.OwnerMapper">
+
+    <!-- Owner 등록 -->
+    <insert id="insertOwner" parameterType="dev.spring.petclinic.model.owner.Owner" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO owners (first_name, last_name, address, city, telephone)
+        VALUES (#{firstName}, #{lastName}, #{address}, #{city}, #{telephone})
+    </insert>
+    
+    <!-- ID로 Owner 조회 (단건 조회용) -->
+    <select id="findById" parameterType="int" resultType="dev.spring.petclinic.model.owner.Owner">
+        SELECT id, first_name, last_name, address, city, telephone
+        FROM owners
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 전화번호 중복 여부 확인 -->
+    <select id="existsByPhoneNumber" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM owners
+        WHERE telephone = #{telephone}
+    </select>
+    
+    <!-- 전화번호로 Owner 조회 -->
+    <select id="findByTelephone" parameterType="string" resultType="dev.spring.petclinic.model.owner.Owner">
+        SELECT id, first_name, last_name, address, city, telephone
+        FROM owners
+        WHERE telephone = #{telephone}
+    </select>
+    
+    <!-- Owner 수정 -->
+    <update id="updateOwnerById" parameterType="dev.spring.petclinic.model.owner.Owner">
+        UPDATE owners
+        <set>
+            <if test="firstName != null">first_name = #{firstName},</if>
+            <if test="lastName != null">last_name = #{lastName},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="telephone != null">telephone = #{telephone},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- Owner와 관련된 Pet 정보 조회 (별도 쿼리) -->
+    <select id="findPetsByOwnerId" parameterType="int" resultType="dev.spring.petclinic.dto.pet.PetDto">
+        SELECT id, owner_id, name, birth_date, type_id
+        FROM pets
+        WHERE owner_id = #{ownerId}
+    </select>
+    
+    <!-- Owner와 Pets를 함께 조회하는 resultMap -->
+    <resultMap id="ownerWithPetsResultMap" type="dev.spring.petclinic.dto.owner.OwnerWithPetsDto">
+    <constructor>
+        <idArg column="id" javaType="java.lang.Integer"/>
+        <arg column="first_name" javaType="java.lang.String"/>
+        <arg column="last_name" javaType="java.lang.String"/>
+        <arg column="address" javaType="java.lang.String"/>
+        <arg column="city" javaType="java.lang.String"/>
+        <arg column="telephone" javaType="java.lang.String"/>
+    </constructor>
+    <collection property="pets" ofType="dev.spring.petclinic.dto.pet.PetDto" javaType="java.util.List"
+        select="findPetsByOwnerId" column="id"/>
+    </resultMap>
+
+    
+    <!-- 단건 조회: Owner와 Pets를 함께 조회 (join 방식 대신 별도 조회 사용) -->
+    <select id="findOwnerWithPets" parameterType="int" resultMap="ownerWithPetsResultMap">
+        SELECT id, first_name, last_name, address, city, telephone
+        FROM owners
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 다건 조회: 전체 Owner 조회 (pets 포함) -->
+    <select id="findAllWithPets" resultMap="ownerWithPetsResultMap">
+        SELECT id, first_name, last_name, address, city, telephone
+        FROM owners
+    </select>
+    
+    <!-- 다건 조회: lastName 기준 Owner 조회 (pets 포함) -->
+    <select id="findByLastNameWithPets" parameterType="string" resultMap="ownerWithPetsResultMap">
+        SELECT id, first_name, last_name, address, city, telephone
+        FROM owners
+        WHERE last_name LIKE CONCAT('%', #{lastName}, '%')
+    </select>
+    
+</mapper>

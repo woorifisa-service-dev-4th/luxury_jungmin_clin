@@ -1,0 +1,764 @@
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\PetclinicApplication.java ====
+package dev.spring.petclinic;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PetclinicApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetclinicApplication.class, args);
+	}
+
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\controller\owner\OwnerController.java ====
+package dev.spring.petclinic.controller.owner;
+
+import dev.spring.petclinic.dto.owner.OwnerDto;
+import dev.spring.petclinic.service.owner.OwnerService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/owners")
+public class OwnerController {
+
+    private final OwnerService ownerService;
+
+    // 신규 Owner 등록 폼
+    @GetMapping("/new")
+    public String initCreationForm(Model model) {
+        model.addAttribute("ownerDto", OwnerDto.builder().build());
+        return "owners/createOrUpdateOwnerForm";
+    }
+
+    // 신규 Owner 등록 처리
+    @PostMapping("/new")
+    public String processCreationForm(@Valid @ModelAttribute("ownerDto") OwnerDto ownerDto,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "owners/createOrUpdateOwnerForm";
+        }
+        if (ownerService.isUserExists(ownerDto.getTelephone())) {
+            bindingResult.rejectValue("telephone", "duplicate", "이미 존재하는 전화번호입니다.");
+            return "owners/createOrUpdateOwnerForm";
+        }
+        int newOwnerId = ownerService.createOwner(ownerDto);
+        redirectAttributes.addFlashAttribute("message", "Owner 생성이 성공적으로 완료되었습니다.");
+        return "redirect:/owners/" + newOwnerId;
+    }
+
+    // 기존 Owner 수정 폼 (id는 숫자만 허용)
+    @GetMapping("/{id:\\d+}/edit")
+    public String initUpdateForm(@PathVariable("id") Integer id, Model model) {
+        OwnerDto ownerDto = ownerService.findOwnerById(id);
+        model.addAttribute("ownerDto", ownerDto);
+        return "owners/createOrUpdateOwnerForm";
+    }
+
+    // 기존 Owner 수정 처리
+    @PostMapping("/{id:\\d+}/edit")
+    public String processUpdateForm(@PathVariable("id") Integer id,
+            @Valid @ModelAttribute("ownerDto") OwnerDto ownerDto,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "owners/createOrUpdateOwnerForm";
+        }
+        if (ownerService.isUserExistsForUpdate(id, ownerDto.getTelephone())) {
+            bindingResult.rejectValue("telephone", "duplicate", "이미 존재하는 전화번호입니다.");
+            return "owners/createOrUpdateOwnerForm";
+        }
+        ownerService.updateOwner(ownerDto.withId(id));
+        redirectAttributes.addFlashAttribute("message", "Owner 수정이 성공적으로 완료되었습니다.");
+        return "redirect:/owners/" + id;
+    }
+
+    // Owner 상세보기 (id는 숫자만 허용)
+    @GetMapping("/{id:\\d+}")
+    public String showOwnerDetails(@PathVariable("id") Integer id, Model model) {
+        OwnerDto ownerDto = ownerService.findOwnerById(id);
+        model.addAttribute("owner", ownerDto);
+        return "owners/ownerDetails";
+    }
+
+    // 검색 폼 (검색 화면)
+    @GetMapping("/find")
+    public String findOwnersPage(Model model) {
+        // 검색 폼에서 사용할 빈 OwnerDto 또는 별도의 SearchOwnerDto 사용 가능
+        model.addAttribute("owner", OwnerDto.builder().build());
+        return "owners/findOwners";
+    }
+
+    // 검색 결과 처리 (예: lastName 기준 검색)
+    @GetMapping("/search")
+    public String searchOwners(@RequestParam(value = "lastName", required = false) String lastName, Model model) {
+        List<OwnerDto> ownersList;
+        if (lastName == null || lastName.trim().isEmpty()) {
+            ownersList = ownerService.findAllOwners();
+        } else {
+            ownersList = ownerService.findOwnersByLastName(lastName);
+        }
+        model.addAttribute("listOwners", ownersList);
+        return "owners/ownersList";
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\controller\pet\PetController.java ====
+package dev.spring.petclinic.controller.pet;
+
+import dev.spring.petclinic.dto.pet.PetDto;
+import dev.spring.petclinic.service.pet.PetService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/owners/{ownerId}/pets")
+public class PetController {
+
+    private final PetService petService;
+
+    // Pet 등록 폼
+    @GetMapping("/new")
+    public String createForm(@PathVariable("ownerId") int ownerId, Model model) {
+        model.addAttribute("petDto", PetDto.builder().ownerId(ownerId).build());
+        return "pets/createOrUpdatePetForm";
+    }
+
+    // Pet 등록 처리
+    @PostMapping("/new")
+    public String processCreationForm(@PathVariable("ownerId") int ownerId,
+            @ModelAttribute("petDto") PetDto petDto) {
+        petDto.setOwnerId(ownerId);
+        petService.createPet(petDto);
+        return "redirect:/owners/" + ownerId;
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\controller\pet\VisitController.java ====
+package dev.spring.petclinic.controller.pet;
+
+import dev.spring.petclinic.dto.pet.VisitDto;
+import dev.spring.petclinic.service.pet.VisitService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/owners/{ownerId}/pets/{petId}/visits")
+public class VisitController {
+
+    private final VisitService visitService;
+
+    // Visit 등록 폼
+    @GetMapping("/new")
+    public String createForm(@PathVariable("ownerId") int ownerId,
+            @PathVariable("petId") int petId,
+            Model model) {
+        model.addAttribute("visitDto", VisitDto.builder().petId(petId).build());
+        return "pets/createOrUpdateVisitForm";
+    }
+
+    // Visit 등록 처리
+    @PostMapping("/new")
+    public String processCreationForm(@PathVariable("ownerId") int ownerId,
+            @PathVariable("petId") int petId,
+            @ModelAttribute("visitDto") VisitDto visitDto) {
+        visitDto = VisitDto.builder()
+                .petId(petId)
+                .visitDate(visitDto.getVisitDate())
+                .description(visitDto.getDescription())
+                .build();
+        visitService.createVisit(visitDto);
+        return "redirect:/owners/" + ownerId;
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\controller\vet\VetController.java ====
+package dev.spring.petclinic.controller.vet;
+
+import dev.spring.petclinic.service.vet.VetService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+@RequiredArgsConstructor
+public class VetController {
+
+    private final VetService vetService;
+
+    @GetMapping("/vets")
+    public String getVetList(Model model) {
+        model.addAttribute("listVets", vetService.getAllVets());
+        return "vets/vetList";
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\dto\owner\OwnerDto.java ====
+package dev.spring.petclinic.dto.owner;
+
+import dev.spring.petclinic.model.owner.Owner;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
+
+@Value
+@Builder
+@With
+public class OwnerDto {
+
+    private Integer id;
+
+    @NotEmpty(message = "❌ First name은 필수 입력 항목입니다.")
+    private String firstName;
+
+    @NotEmpty(message = "❌ Last name은 필수 입력 항목입니다.")
+    private String lastName;
+
+    @NotEmpty(message = "❌ Address는 비어 있을 수 없습니다.")
+    private String address;
+
+    @NotEmpty(message = "❌ City는 비어 있을 수 없습니다.")
+    private String city;
+
+    @NotEmpty(message = "❌ Telephone은 비어 있을 수 없습니다.")
+    @Pattern(regexp = "\\d{9,11}$", message = "⚠ 전화번호는 숫자 9~11자리여야 합니다.")
+    private String telephone;
+
+    // Entity → DTO 변환
+    public static OwnerDto fromEntity(Owner owner) {
+        return OwnerDto.builder()
+                .id(owner.getId())
+                .firstName(owner.getFirstName())
+                .lastName(owner.getLastName())
+                .address(owner.getAddress())
+                .city(owner.getCity())
+                .telephone(owner.getTelephone())
+                .build();
+    }
+
+    // DTO → Entity 변환
+    public Owner toEntity() {
+        return Owner.builder()
+                .id(this.id)
+                .firstName(this.firstName)
+                .lastName(this.lastName)
+                .address(this.address)
+                .city(this.city)
+                .telephone(this.telephone)
+                .build();
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\dto\pet\PetDto.java ====
+package dev.spring.petclinic.dto.pet;
+
+import dev.spring.petclinic.model.pet.Pet;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PetDto {
+    private int id;
+    private int ownerId;
+    private String name;
+    private LocalDate birthDate;
+    private int typeId;
+    private List<VisitDto> visits;
+
+    // DTO → Entity 변환
+    public Pet toEntity() {
+        return Pet.builder()
+                .id(this.id)
+                .ownerId(this.ownerId)
+                .name(this.name)
+                .birthDate(this.birthDate)
+                .typeId(this.typeId)
+                .visits(this.visits != null ? this.visits.stream().map(VisitDto::toEntity).collect(Collectors.toList())
+                        : null)
+                .build();
+    }
+
+    // Entity → DTO 변환
+    public static PetDto fromEntity(Pet pet) {
+        return PetDto.builder()
+                .id(pet.getId())
+                .ownerId(pet.getOwnerId())
+                .name(pet.getName())
+                .birthDate(pet.getBirthDate())
+                .typeId(pet.getTypeId())
+                .visits(pet.getVisits() != null
+                        ? pet.getVisits().stream().map(VisitDto::fromEntity).collect(Collectors.toList())
+                        : null)
+                .build();
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\dto\pet\VisitDto.java ====
+package dev.spring.petclinic.dto.pet;
+
+import dev.spring.petclinic.model.pet.Visit;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+import java.time.LocalDate;
+
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class VisitDto {
+    private int id;
+    private int petId;
+    private LocalDate visitDate;
+    private String description;
+
+    public Visit toEntity() {
+        return Visit.builder()
+                .id(this.id)
+                .petId(this.petId)
+                .visitDate(this.visitDate)
+                .description(this.description)
+                .build();
+    }
+
+    public static VisitDto fromEntity(Visit visit) {
+        return VisitDto.builder()
+                .id(visit.getId())
+                .petId(visit.getPetId())
+                .visitDate(visit.getVisitDate())
+                .description(visit.getDescription())
+                .build();
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\dto\vet\VetDto.java ====
+package dev.spring.petclinic.dto.vet;
+
+import dev.spring.petclinic.model.vet.Vet;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.List;
+
+@Builder
+@Getter
+public class VetDto {
+    private int id;
+    private String firstName;
+    private String lastName;
+    private List<String> specialties;
+
+    public static VetDto fromEntity(Vet vet) {
+        return VetDto.builder()
+                .id(vet.getId())
+                .firstName(vet.getFirstName())
+                .lastName(vet.getLastName())
+                .specialties(vet.getSpecialties())
+                .build();
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\exception\GlobalExceptionHandler.java ====
+package dev.spring.petclinic.exception;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(NotFoundException.class)
+    public String handleNotFoundException(NotFoundException ex, Model model) {
+        model.addAttribute("message", ex.getMessage());
+        return "error"; // error.html 뷰
+    }
+    // 추가적인 예외 핸들러 구현 가능
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\exception\NotFoundException.java ====
+package dev.spring.petclinic.exception;
+
+public class NotFoundException extends RuntimeException {
+    public NotFoundException(String message) {
+        super(message);
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\mapper\owner\OwnerMapper.java ====
+package dev.spring.petclinic.mapper.owner;
+
+import dev.spring.petclinic.model.owner.Owner;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+
+@Mapper
+public interface OwnerMapper {
+    int insertOwner(Owner owner);
+
+    Owner findById(Integer id);
+
+    boolean existsByPhoneNumber(String telephone);
+
+    Owner findByTelephone(String telephone);
+
+    int updateOwnerById(Owner owner);
+
+    // 전체 Owner 조회
+    List<Owner> findAll();
+
+    // lastName 기준 Owner 검색
+    List<Owner> findByLastName(@Param("lastName") String lastName);
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\mapper\pet\PetMapper.java ====
+package dev.spring.petclinic.mapper.pet;
+
+import dev.spring.petclinic.model.pet.Pet;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+
+@Mapper
+public interface PetMapper {
+    // ownerId로 Pet 조회
+    List<Pet> selectPetsByOwnerId(@Param("ownerId") int ownerId);
+
+    // Pet 등록
+    void insertPet(Pet pet);
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\mapper\pet\VisitMapper.java ====
+package dev.spring.petclinic.mapper.pet;
+
+import dev.spring.petclinic.model.pet.Visit;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+
+@Mapper
+public interface VisitMapper {
+    // petId로 Visit 조회
+    List<Visit> selectVisitsByPetId(@Param("petId") int petId);
+
+    // Visit 등록 (옵션)
+    void insertVisit(Visit visit);
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\mapper\vet\VetMapper.java ====
+package dev.spring.petclinic.mapper.vet;
+
+import dev.spring.petclinic.model.vet.Vet;
+import org.apache.ibatis.annotations.Mapper;
+import java.util.List;
+
+@Mapper
+public interface VetMapper {
+    List<Vet> findAllVets();
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\model\owner\Owner.java ====
+package dev.spring.petclinic.model.owner;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.NoArgsConstructor;
+import lombok.With;
+
+@Value
+@Builder
+@With
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+public class Owner {
+    Integer id;
+    String firstName;
+    String lastName;
+    String address;
+    String city;
+    String telephone;
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\model\pet\Pet.java ====
+package dev.spring.petclinic.model.pet;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Value;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Value
+@Builder(toBuilder = true)
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+public class Pet {
+    private int id;
+    private int ownerId;
+    private String name;
+    private LocalDate birthDate;
+    private int typeId;
+    private List<Visit> visits;
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\model\pet\Visit.java ====
+package dev.spring.petclinic.model.pet;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Visit {
+    private int id;
+    private int petId;
+    private LocalDate visitDate;
+    private String description;
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\model\vet\Vet.java ====
+package dev.spring.petclinic.model.vet;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Vet {
+    private int id;
+    private String firstName;
+    private String lastName;
+    private List<String> specialties;
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\service\owner\OwnerService.java ====
+package dev.spring.petclinic.service.owner;
+
+import dev.spring.petclinic.dto.owner.OwnerDto;
+import dev.spring.petclinic.mapper.owner.OwnerMapper;
+import dev.spring.petclinic.model.owner.Owner;
+import dev.spring.petclinic.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class OwnerService {
+
+    private final OwnerMapper ownerMapper;
+
+    // 신규 Owner 등록
+    @Transactional
+    public int createOwner(OwnerDto ownerDto) {
+        Owner owner = ownerDto.toEntity();
+        ownerMapper.insertOwner(owner);
+        return owner.getId();
+    }
+
+    // Owner 수정
+    @Transactional
+    public void updateOwner(OwnerDto ownerDto) {
+        int updated = ownerMapper.updateOwnerById(ownerDto.toEntity());
+        if (updated == 0) {
+            throw new IllegalStateException("업데이트에 실패하였습니다.");
+        }
+    }
+
+    // ID로 Owner 조회
+    @Transactional(readOnly = true)
+    public OwnerDto findOwnerById(Integer id) {
+        Owner owner = ownerMapper.findById(id);
+        if (owner == null) {
+            throw new NotFoundException("존재하지 않는 Owner입니다.");
+        }
+        return OwnerDto.fromEntity(owner);
+    }
+
+    // 신규 등록 시 중복 전화번호 체크
+    @Transactional(readOnly = true)
+    public boolean isUserExists(String telephone) {
+        return ownerMapper.existsByPhoneNumber(telephone);
+    }
+
+    // 업데이트 시 중복 전화번호 체크 (현재 Owner의 전화번호 제외)
+    @Transactional(readOnly = true)
+    public boolean isUserExistsForUpdate(Integer id, String telephone) {
+        Owner existingOwner = ownerMapper.findByTelephone(telephone);
+        return existingOwner != null && !existingOwner.getId().equals(id);
+    }
+
+    // 전체 Owner 조회
+    @Transactional(readOnly = true)
+    public List<OwnerDto> findAllOwners() {
+        List<Owner> owners = ownerMapper.findAll();
+        return owners.stream()
+                .map(OwnerDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    // 성(lastName) 기준 Owner 검색
+    @Transactional(readOnly = true)
+    public List<OwnerDto> findOwnersByLastName(String lastName) {
+        List<Owner> owners = ownerMapper.findByLastName(lastName);
+        return owners.stream()
+                .map(OwnerDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\service\pet\PetService.java ====
+package dev.spring.petclinic.service.pet;
+
+import dev.spring.petclinic.dto.pet.PetDto;
+import dev.spring.petclinic.mapper.pet.PetMapper;
+import dev.spring.petclinic.mapper.pet.VisitMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+import dev.spring.petclinic.model.pet.Pet;
+
+@Service
+@RequiredArgsConstructor
+public class PetService {
+    private final PetMapper petMapper;
+    private final VisitMapper visitMapper;
+
+    @Transactional(readOnly = true)
+    public List<PetDto> findPetsByOwner(int ownerId) {
+        List<Pet> pets = petMapper.selectPetsByOwnerId(ownerId);
+        // 각 Pet에 대해 Visit 조회
+        return pets.stream().map(pet -> {
+            pet = pet.toBuilder().visits(visitMapper.selectVisitsByPetId(pet.getId())).build();
+            return PetDto.fromEntity(pet);
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void createPet(PetDto petDto) {
+        petMapper.insertPet(petDto.toEntity());
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\service\pet\VisitService.java ====
+package dev.spring.petclinic.service.pet;
+
+import dev.spring.petclinic.dto.pet.VisitDto;
+import dev.spring.petclinic.mapper.pet.VisitMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class VisitService {
+    private final VisitMapper visitMapper;
+
+    @Transactional
+    public void createVisit(VisitDto visitDto) {
+        visitMapper.insertVisit(visitDto.toEntity());
+    }
+}
+
+
+==== FILE: C:\woori-workspace\team3\luxury_jungmin_clin_mango0422_dev\src\main\java\dev\spring\petclinic\service\vet\VetService.java ====
+package dev.spring.petclinic.service.vet;
+
+import dev.spring.petclinic.dto.vet.VetDto;
+import dev.spring.petclinic.mapper.vet.VetMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class VetService {
+
+    private final VetMapper vetMapper;
+
+    @Transactional(readOnly = true)
+    public List<VetDto> getAllVets() {
+        return vetMapper.findAllVets().stream()
+                .map(VetDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+}
+

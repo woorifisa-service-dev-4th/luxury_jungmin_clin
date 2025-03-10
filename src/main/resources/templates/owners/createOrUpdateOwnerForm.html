@@ -5,7 +5,7 @@
   <body>
     <h2>Owner</h2>
     <form
-      th:object="${ownerEditDTO}"
+      th:object="${ownerDto}"
       class="form-horizontal"
       id="add-owner-form"
       method="post"
@@ -83,7 +83,7 @@
       <button
         class="btn btn-primary"
         type="submit"
-        th:text="${ownerEditDTO.id == null ? 'Add Owner' : 'Edit Owner'}"
+        th:text="${ownerDto.id == null ? 'Add Owner' : 'Edit Owner'}"
       >
         Add Owner
       </button>

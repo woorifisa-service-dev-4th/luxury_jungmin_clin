@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.spring.petclinic.mapper.pet.VisitMapper">
+    <select id="selectVisitsByPetId" resultType="dev.spring.petclinic.model.pet.Visit">
+        SELECT * FROM visits WHERE pet_id = #{petId}
+    </select>
+
+    <insert id="insertVisit" parameterType="dev.spring.petclinic.model.pet.Visit">
+        INSERT INTO visits (pet_id, visit_date, description)
+        VALUES (#{petId}, #{visitDate}, #{description})
+    </insert>
+</mapper>
