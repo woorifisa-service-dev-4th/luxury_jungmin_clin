@@ -28,6 +28,7 @@ public class PetDto {
 
     public void assignOwner(int ownerId) {
         this.ownerId = ownerId;
+    }
 
     public static PetDto from(Pets pet, List<PetVisitDto> visits) {
         return PetDto.builder()
@@ -35,7 +36,7 @@ public class PetDto {
                 .ownerId(pet.getOwnerId())
                 .name(pet.getName())
                 .birthDate(pet.getBirthDate())
-                .type(pet.getType())
+                .typeId(pet.getTypeId())
                 .visits(visits)
                 .build();
     }
