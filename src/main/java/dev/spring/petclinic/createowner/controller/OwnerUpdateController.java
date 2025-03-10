@@ -1,6 +1,6 @@
 package dev.spring.petclinic.createowner.controller;
 
-import dev.spring.petclinic.createowner.dto.OwnerDTO;
+import dev.spring.petclinic.createowner.dto.OwnerEditDTO;
 import dev.spring.petclinic.createowner.service.OwnerCreateService;
 import jakarta.validation.Valid;
 
@@ -27,27 +27,27 @@ public class OwnerUpdateController {
     // GET 요청: 기존 Owner 데이터를 불러와 수정 폼 초기화
     @GetMapping
     public String initUpdateForm(@PathVariable("id") Integer id, Model model) {
-        OwnerDTO ownerDTO = ownerCreateService.findOwnerById(id);
-        model.addAttribute("ownerDTO", ownerDTO);
+        OwnerEditDTO ownerEditDTO = ownerCreateService.findOwnerById(id);
+        model.addAttribute("ownerEditDTO", ownerEditDTO);
         return "owners/createOrUpdateOwnerForm";
     }
 
     // POST 요청: 수정 처리 (컨트롤러에서 직접 검증)
     @PostMapping
     public String processUpdateForm(@PathVariable("id") Integer id,
-            @Valid @ModelAttribute("ownerDTO") OwnerDTO ownerDTO,
+            @Valid @ModelAttribute("ownerEditDTO") OwnerEditDTO ownerEditDTO,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "owners/createOrUpdateOwnerForm";
         }
 
-        if (ownerCreateService.isUserExistsForUpdate(id, ownerDTO.getTelephone())) {
+        if (ownerCreateService.isUserExistsForUpdate(id, ownerEditDTO.getTelephone())) {
             bindingResult.rejectValue("telephone", "duplicate", "이미 존재하는 전화번호입니다.");
             return "owners/createOrUpdateOwnerForm";
         }
 
-        ownerCreateService.updateOwner(ownerDTO.withId(id)); // ✅ 기존 ID 유지하면서 업데이트
+        ownerCreateService.updateOwner(ownerEditDTO.withId(id)); // ✅ 기존 ID 유지하면서 업데이트
         redirectAttributes.addFlashAttribute("message", "Owner 수정이 성공적으로 완료되었습니다.");
         return "redirect:/owners/" + id;
     }

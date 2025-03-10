@@ -1,6 +1,6 @@
 package dev.spring.petclinic.createowner.controller;
 
-import dev.spring.petclinic.createowner.dto.OwnerDTO;
+import dev.spring.petclinic.createowner.dto.OwnerEditDTO;
 import dev.spring.petclinic.createowner.service.OwnerCreateService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -23,13 +23,13 @@ public class OwnerCreateController {
     // GET 요청: 신규 Owner 등록 폼 초기화
     @GetMapping("/owners/new")
     public String initCreationForm(Model model) {
-        model.addAttribute("ownerDTO", OwnerDTO.builder().build());
+        model.addAttribute("ownerEditDTO", OwnerEditDTO.builder().build());
         return "owners/createOrUpdateOwnerForm";
     }
 
     // POST 요청: 신규 Owner 등록 처리 (자동 검증)
     @PostMapping("/owners/new")
-    public String processCreationForm(@Valid @ModelAttribute("ownerDTO") OwnerDTO ownerDTO,
+    public String processCreationForm(@Valid @ModelAttribute("ownerEditDTO") OwnerEditDTO ownerDTO,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
