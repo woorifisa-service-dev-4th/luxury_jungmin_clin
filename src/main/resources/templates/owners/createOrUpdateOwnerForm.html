@@ -80,7 +80,13 @@
         ></div>
       </div>
 
-      <button class="btn btn-primary" type="submit">Add Owner</button>
+      <button
+        class="btn btn-primary"
+        type="submit"
+        th:text="${ownerDTO.id == null ? 'Add Owner' : 'Edit Owner'}"
+      >
+        Add Owner
+      </button>
     </form>
   </body>
 </html>
