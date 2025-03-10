@@ -1,12 +1,16 @@
 package dev.spring.petclinic.createowner.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
+import lombok.NoArgsConstructor;
 import lombok.With;
 
 @Value
-@Builder(toBuilder = true)
-@With // 필요시 id 변경 등을 위한 withId() 메서드를 생성
+@Builder
+@With
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class Owner {
     Integer id;
     String firstName;
