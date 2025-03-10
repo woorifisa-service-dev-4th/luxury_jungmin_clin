@@ -24,7 +24,14 @@
         <td th:text="${owner.address}"/>
         <td th:text="${owner.city}"/>
         <td th:text="${owner.telephone}"/>
-        <td th:text="${#strings.listJoin(owner.pets.![name], ' ')}"></td>
+<!--        owner.pet이 null이면 사용x-->
+        <td th:if="${owner.pets != null}">
+            <span th:each="pet : ${owner.pets}">
+                <span th:text="${pet.name}"></span>
+                <span th:if="${!#lists.isEmpty(owner.pets)}">,</span>
+            </span>
+        </td>
+        <td th:unless="${owner.pets != null}">No pets</td>
     </tr>
     </tbody>
 </table>

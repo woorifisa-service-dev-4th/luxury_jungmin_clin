@@ -60,23 +60,4 @@ public class SearchResultService {
 
         return PetVisitDto.from(visits);
     }
-
-    /**
-     * Visits List를 PetVisitDto List로 변환
-     * @param visits Visits List
-     * @return List<PetVisitDto>
-     */
-    private List<PetVisitDto> convertToPetVisitDtoList(List<Visits> visits) {
-        List<PetVisitDto> petVisitDtoList = new ArrayList<>();
-        for (Visits visit : visits) {
-            PetVisitDto petVisitDto = PetVisitDto.builder()
-                    .id(visit.getId())
-                    .petId(visit.getPetId())
-                    .visitDate(visit.getVisitDate())
-                    .description(visit.getDescription())
-                    .build();
-            petVisitDtoList.add(petVisitDto);
-        }
-        return petVisitDtoList;
-    }
 }
