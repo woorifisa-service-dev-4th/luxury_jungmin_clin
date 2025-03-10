@@ -1,6 +1,7 @@
 package dev.spring.petclinic.findowner.mapper;
 
 import dev.spring.petclinic.findowner.model.Owners;
+import dev.spring.petclinic.findowner.model.Pet;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -16,5 +17,7 @@ public interface OwnersMapper {
 
     // 모든 Owner 목록 조회하기
     List<Owners> findAllOwners();
+
+    List<Pet> findPetsByOwnerId();
 }
 

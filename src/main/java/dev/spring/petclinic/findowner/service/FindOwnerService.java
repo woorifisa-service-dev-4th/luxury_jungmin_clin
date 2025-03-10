@@ -2,6 +2,7 @@ package dev.spring.petclinic.findowner.service;
 
 import dev.spring.petclinic.findowner.mapper.OwnersMapper;
 import dev.spring.petclinic.findowner.model.Owners;
+import dev.spring.petclinic.findowner.model.Pet;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public class FindOwnerService {
 
     public List<Owners> findAllOwners() {
         return ownersMapper.findAllOwners();
+    }
+
+    public List<Pet> findPetsByOwnerId() {
+        return ownersMapper.findPetsByOwnerId();
     }
 }
 
