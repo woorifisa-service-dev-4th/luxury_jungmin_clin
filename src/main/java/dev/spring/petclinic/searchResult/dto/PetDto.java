@@ -1,5 +1,6 @@
 package dev.spring.petclinic.searchResult.dto;
 
+import lombok.*;
 import dev.spring.petclinic.searchResult.model.Pets;
 import dev.spring.petclinic.searchResult.service.SearchResultService;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Builder
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,9 +22,12 @@ public class PetDto {
     private int ownerId;
     private String name;
     private LocalDate birthDate;
-    private String type;
+    private int typeId;
 
     private List<PetVisitDto> visits;
+
+    public void assignOwner(int ownerId) {
+        this.ownerId = ownerId;
 
     public static PetDto from(Pets pet, List<PetVisitDto> visits) {
         return PetDto.builder()
