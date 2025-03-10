@@ -49,7 +49,7 @@ public class SearchResultService {
     public List<PetDto> findPetsByOwner(int ownerId) {
         List<Pets> pets = petsMapper.selectPetsByOwnerId(ownerId);
 
-        return convertToPetDtoList(pets);
+        return PetDto.from(pets, this);
     }
 
     /**
@@ -58,7 +58,7 @@ public class SearchResultService {
     public List<PetVisitDto> findPetVisitsByPet(int petId) {
         List<Visits> visits = visitsMapper.selectVisitsByPetId(petId);
 
-        return convertToPetVisitDtoList(visits);
+        return PetVisitDto.from(visits);
     }
 
     /**
@@ -78,25 +78,5 @@ public class SearchResultService {
             petVisitDtoList.add(petVisitDto);
         }
         return petVisitDtoList;
-    }
-
-    /**
-     * Pets List 를 PetDto List로 변환
-     * @param pets Pets List
-     * @return List<PetDto>
-     */
-    private List<PetDto> convertToPetDtoList(List<Pets> pets) {
-        List<PetDto> petDtoList = new ArrayList<>();
-        for (Pets pet : pets) {
-            PetDto petDto = PetDto.builder()
-                    .id(pet.getId())
-                    .name(pet.getName())
-                    .birthDate(pet.getBirthDate())
-                    .typeId(pet.getTypeId())
-                    .visits(findPetVisitsByPet(pet.getId()))
-                    .build();
-            petDtoList.add(petDto);
-        }
-        return petDtoList;
     }
 }

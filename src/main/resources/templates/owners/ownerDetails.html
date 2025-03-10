@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html xmlns:th="https://www.thymeleaf.org"
-  th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+  th:replace="~{fragments/layout :: layout (~{::body},'owner')}">
 
   <body>
   
@@ -9,7 +9,7 @@
     <h2>Owner Information</h2>
   
   
-    <table class="table table-striped" th:object="${owners}">
+    <table class="table table-striped" th:object="${owner}">
       <tr>
         <th>Name</th>
         <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
@@ -28,9 +28,9 @@
       </tr>
     </table>
 
-    <a th:href="@{{id}/edit(id=${owners.id})}" class="btn btn-primary">Edit
+    <a th:href="@{{id}/edit(id=${owner.id})}" class="btn btn-primary">Edit
       Owner</a>
-    <a th:href="@{{id}/pets/new(id=${owners.id})}" class="btn btn-primary">Add
+    <a th:href="@{{id}/pets/new(id=${owner.id})}" class="btn btn-primary">Add
       New Pet</a>
 
     <br />
@@ -40,7 +40,7 @@
 
     <table class="table table-striped">
 
-      <tr th:each="pet : ${owners.pets}">
+      <tr th:each="pet : ${owner.pets}">
         <td valign="top">
           <dl class="dl-horizontal">
             <dt>Name</dt>
@@ -66,10 +66,10 @@
             </tr>
             <tr>
 <!--              <td><a-->
-<!--                th:href="@{{ownerId}/pets/{petId}/edit(ownerId=${owners.id},petId=${pet.id})}">Edit-->
+<!--                th:href="@{{ownerId}/pets/{petId}/edit(ownerId=${owner.id},petId=${pet.id})}">Edit-->
 <!--                  Pet</a></td>-->
 <!--              <td><a-->
-<!--                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owners.id},petId=${pet.id})}">Add-->
+<!--                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owner.id},petId=${pet.id})}">Add-->
 <!--                  Visit</a></td>-->
             </tr>
           </table>
