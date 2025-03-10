@@ -6,4 +6,8 @@
     <select id="selectPetsByOwnerId" resultType="dev.spring.petclinic.searchResult.model.Pets">
         SELECT * FROM pets WHERE owner_id = #{ownerId}
     </select>
+
+    <insert id="insertPet" parameterType="dev.spring.petclinic.searchResult.model.Pets">
+        INSERT INTO pets (name, birth_date, type_id, owner_id) VALUES (#{name}, #{birthDate}, #{typeId}, #{ownerId})
+    </insert>
 </mapper>
