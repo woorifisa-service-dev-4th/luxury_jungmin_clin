@@ -2,12 +2,12 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="dev.spring.petclinic.searchResult.mapper.PetsMapper">
-    <select id="selectPetsByOwnerId" resultType="dev.spring.petclinic.searchResult.model.Pets">
+<mapper namespace="dev.spring.petclinic.old.searchResult.mapper.PetsMapper">
+    <select id="selectPetsByOwnerId" resultType="dev.spring.petclinic.old.searchResult.model.Pets">
         SELECT * FROM pets WHERE owner_id = #{ownerId}
     </select>
 
-    <insert id="insertPet" parameterType="dev.spring.petclinic.searchResult.model.Pets">
+    <insert id="insertPet" parameterType="dev.spring.petclinic.old.searchResult.model.Pets">
         INSERT INTO pets (name, birth_date, type_id, owner_id) VALUES (#{name}, #{birthDate}, #{typeId}, #{ownerId})
     </insert>
 </mapper>

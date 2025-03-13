@@ -1,9 +1,9 @@
 package dev.spring.petclinic;
 
 
-import dev.spring.petclinic.findowner.mapper.FindOwnerMapper;
-import dev.spring.petclinic.findowner.model.FindOwners;
-import dev.spring.petclinic.findowner.model.Pet;
+import dev.spring.petclinic.old.findowner.mapper.FindOwnerMapper;
+import dev.spring.petclinic.old.findowner.model.FindOwners;
+import dev.spring.petclinic.old.findowner.model.Pet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

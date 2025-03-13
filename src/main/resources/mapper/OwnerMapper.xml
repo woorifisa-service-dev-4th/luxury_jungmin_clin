@@ -3,16 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="dev.spring.petclinic.createowner.mapper.OwnerMapper">
+<mapper namespace="dev.spring.petclinic.old.createowner.mapper.OwnerMapper">
 
     <!-- Owner 등록 -->
-    <insert id="insertOwner" parameterType="dev.spring.petclinic.createowner.entity.Owner" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertOwner" parameterType="dev.spring.petclinic.old.createowner.entity.Owner" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO owners (first_name, last_name, address, city, telephone)
         VALUES (#{firstName}, #{lastName}, #{address}, #{city}, #{telephone})
     </insert>
 
     <!-- Owner 조회 by ID -->
-    <select id="findById" parameterType="int" resultType="dev.spring.petclinic.createowner.entity.Owner">
+    <select id="findById" parameterType="int" resultType="dev.spring.petclinic.old.createowner.entity.Owner">
         SELECT id, first_name, last_name, address, city, telephone
         FROM owners
         WHERE id = #{id}
@@ -26,14 +26,14 @@
     </select>
 
     <!-- 추가: 전화번호로 Owner 조회 -->
-    <select id="findByTelephone" parameterType="string" resultType="dev.spring.petclinic.createowner.entity.Owner">
+    <select id="findByTelephone" parameterType="string" resultType="dev.spring.petclinic.old.createowner.entity.Owner">
         SELECT id, first_name, last_name, address, city, telephone
         FROM owners
         WHERE telephone = #{telephone}
     </select>
 
     <!-- Owner 수정 -->
-    <update id="updateOwnerById" parameterType="dev.spring.petclinic.createowner.entity.Owner">
+    <update id="updateOwnerById" parameterType="dev.spring.petclinic.old.createowner.entity.Owner">
         UPDATE owners
         <set>
             <if test="firstName != null">first_name = #{firstName},</if>
