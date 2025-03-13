@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="dev.spring.petclinic.findowner.mapper.FindOwnerMapper">
+<mapper namespace="dev.spring.petclinic.old.findowner.mapper.FindOwnerMapper">
 
     <!-- 특정 ID로 Owner 조회 -->
 
-    <select id="findOwnerById" parameterType="long" resultType="dev.spring.petclinic.findowner.model.FindOwners">
+    <select id="findOwnerById" parameterType="long" resultType="dev.spring.petclinic.old.findowner.model.FindOwners">
         SELECT id, first_name, last_name, address, city, telephone
         FROM owners
         WHERE id = #{id}
     </select>
 
-    <resultMap id="ownerResultMap" type="dev.spring.petclinic.findowner.model.FindOwners">
+    <resultMap id="ownerResultMap" type="dev.spring.petclinic.old.findowner.model.FindOwners">
         <id column="id" property="id" />
         <result column="first_name" property="firstName" />
         <result column="last_name" property="lastName" />
@@ -20,7 +20,7 @@
         <result column="city" property="city" />
         <result column="telephone" property="telephone" />
         <!-- owner.id 값을 이용해서 pets를 조회 -->
-        <collection property="pets" ofType="dev.spring.petclinic.findowner.model.Pet"
+        <collection property="pets" ofType="dev.spring.petclinic.old.findowner.model.Pet"
                     select="findPetsByOwnerId" column="id"/>
     </resultMap>
 
@@ -31,14 +31,14 @@
     </select>
 
     <!-- 성(last_name)으로 Owner 검색 -->
-    <select id="findOwnersByLastName" parameterType="string" resultType="dev.spring.petclinic.findowner.model.FindOwners">
+    <select id="findOwnersByLastName" parameterType="string" resultType="dev.spring.petclinic.old.findowner.model.FindOwners">
         SELECT id, first_name, last_name, address, city, telephone
         FROM owners
         WHERE last_name LIKE CONCAT('%', #{lastName}, '%')
     </select>
 
     <!-- Owner ID로 해당하는 Pet 정보 조회 -->
-    <select id="findPetsByOwnerId" parameterType="int" resultType="dev.spring.petclinic.findowner.model.Pet">
+    <select id="findPetsByOwnerId" parameterType="int" resultType="dev.spring.petclinic.old.findowner.model.Pet">
         SELECT id, owner_id, name
         FROM pets
         WHERE owner_id = #{ownerId}
