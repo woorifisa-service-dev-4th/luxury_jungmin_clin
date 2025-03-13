@@ -1,23 +1,20 @@
+# common
 spring:
-  config:
-    import: optional:file:.env[.properties]
   application:
     name: petclinic
+  config:
+    import: optional:file:.${SPRING_PROFILES_ACTIVE:dev}.env[.properties]  # 환경별 .env 파일 자동 선택
+  profiles:
+    default: dev  # 기본 프로파일
   jpa:
     hibernate:
-      ddl-auto: none # MyBatis 사용 시 JPA 미사용 또는 참고용
+      ddl-auto: none  # MyBatis 사용 시 JPA 미사용 또는 참고용
     open-in-view: false
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DB:jmclinic}?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
   messages:
     basename: messages/messages
-
   sql:
     init:
-      mode: always # schema.sql, data.sql 실행
+      mode: always  # schema.sql, data.sql 실행
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml

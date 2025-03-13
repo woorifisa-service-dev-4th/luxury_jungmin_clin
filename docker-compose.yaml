@@ -3,6 +3,8 @@ services:
     image: mysql:8.4
     container_name: mysql-jmclinic
     restart: always
+    env_file:
+      - .dev.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB}
